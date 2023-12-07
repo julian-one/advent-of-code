@@ -4,24 +4,28 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"log"
 	"os"
+	"strconv"
 )
 
-func Solution() error {
-	err := readFileByLine()
+func Solution() (int, error) {
+	sum, err := processFileByLine()
 	if err != nil {
-		return err
+		return -1, err
 	}
-	return nil
+	return sum, nil
 }
 
-func readFileByLine() error {
-	f, err := os.Open("./day1/part1/input-trunc.txt")
+func processFileByLine() (int, error) {
+	r, f, err := readFile("./day1/part1/input.txt")
 	if err != nil {
-		return err
+		log.Panic(err)
 	}
 	defer f.Close()
-	r := bufio.NewReader(f)
+
+	var calibrationValues []int
+	var sum int
 	for {
 		line, err := r.ReadString('\n')
 		if err == io.EOF {
@@ -30,20 +34,74 @@ func readFileByLine() error {
 			fmt.Printf("error reading the string %s", err)
 			break
 		}
-		fmt.Printf("readFileByLine, line: %s", line)
-		findNumbersInLine(line)
+		nums := findAllIntsInLine(line)
+		n, err := processIntList(nums)
+		if err != nil {
+			log.Panic(err)
+		}
+		calibrationValues = append(calibrationValues, n)
 	}
-	return nil
+	sum = sumArray(calibrationValues)
+	return sum, nil
 }
 
-func findNumbersInLine(line string) (int, int, error) {
+func readFile(path string) (*bufio.Reader, *os.File, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, nil, err
+	}
+	r := bufio.NewReader(f)
+	return r, f, nil
+}
 
+func findAllIntsInLine(line string) []int {
+	var nums []int
 	for _, el := range line {
-		// use ASCII to check if it is a digit
+		// use ASCII value to check if it is a digit
 		if el >= '0' && el <= '9' {
-			fmt.Println("findNumbersInLine, el:", el)
+			// from ASCII value to int
+			// 0 has ASCII value of 48
+			// e.g. 3's ASCII value is 51, 51 - 48 = 3
+			digit := int(el - '0')
+			nums = append(nums, digit)
 		}
 	}
+	return nums
+}
 
-	return 10, 13, nil
+func processIntList(list []int) (int, error) {
+	if len(list) == 1 {
+		c, err := combineInts(list[0], list[0])
+		if err != nil {
+			log.Panic(err)
+		}
+		return c, nil
+	}
+
+	a, b := list[0], list[len(list)-1]
+	c, err := combineInts(a, b)
+	if err != nil {
+		log.Panic(err)
+	}
+	return c, nil
+}
+
+func combineInts(a int, b int) (int, error) {
+	str1 := strconv.Itoa(a)
+	str2 := strconv.Itoa(b)
+	combined := str1 + str2
+
+	result, err := strconv.Atoi(combined)
+	if err != nil {
+		return -1, err
+	}
+	return result, nil
+}
+
+func sumArray(arr []int) int {
+	sum := 0
+	for _, v := range arr {
+		sum += v
+	}
+	return sum
 }
