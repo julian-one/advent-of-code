@@ -7,12 +7,16 @@ import (
 	"os"
 )
 
-func Solution() {
-	readFileByLine()
-
+func Solution() error {
+	err := readFileByLine()
+	if err != nil {
+		return err
+	}
+	return nil
 }
+
 func readFileByLine() error {
-	f, err := os.Open("./day1/part1/input.txt")
+	f, err := os.Open("./day1/part1/input-trunc.txt")
 	if err != nil {
 		return err
 	}
@@ -26,11 +30,20 @@ func readFileByLine() error {
 			fmt.Printf("error reading the string %s", err)
 			break
 		}
-		fmt.Print(line)
+		fmt.Printf("readFileByLine, line: %s", line)
+		findNumbersInLine(line)
 	}
 	return nil
 }
 
-func findNumbersInLine(line string) int {
-	return 10
+func findNumbersInLine(line string) (int, int, error) {
+
+	for _, el := range line {
+		// use ASCII to check if it is a digit
+		if el >= '0' && el <= '9' {
+			fmt.Println("findNumbersInLine, el:", el)
+		}
+	}
+
+	return 10, 13, nil
 }

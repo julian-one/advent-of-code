@@ -5,5 +5,8 @@ import (
 )
 
 func main() {
-	part1.Solution()
+	err := part1.Solution()
+	if err != nil {
+		panic(err)
+	}
 }
