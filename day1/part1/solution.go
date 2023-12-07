@@ -18,7 +18,7 @@ func Solution() (int, error) {
 }
 
 func processFileByLine() (int, error) {
-	r, f, err := readFile("./day1/part1/input.txt")
+	r, f, err := readFile("./day1/input.txt")
 	if err != nil {
 		log.Panic(err)
 	}
