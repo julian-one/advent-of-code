@@ -1,4 +1,4 @@
-package part1
+package day1
 
 import (
 	"bufio"
@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"regexp"
 	"strconv"
 )
 
@@ -34,7 +35,10 @@ func processFileByLine() (int, error) {
 			fmt.Printf("error reading the string %s", err)
 			break
 		}
-		nums := findAllIntsInLine(line)
+		fmt.Println("(1) line:", line)
+		transformedLine := transformDigitsInLine(line)
+		fmt.Println("(2) transformed line:", transformedLine)
+		nums := findAllIntsInLine(transformedLine)
 		n, err := processIntList(nums)
 		if err != nil {
 			log.Panic(err)
@@ -67,6 +71,27 @@ func findAllIntsInLine(line string) []int {
 		}
 	}
 	return nums
+}
+
+func transformDigitsInLine(line string) string {
+	m := map[string]string{
+		"one":   "1",
+		"two":   "2",
+		"three": "3",
+		"four":  "4",
+		"five":  "5",
+		"six":   "6",
+		"seven": "7",
+		"eight": "8",
+		"nine":  "9",
+	}
+
+	for word, num := range m {
+		re := regexp.MustCompile(word)
+		line = re.ReplaceAllString(line, num)
+	}
+
+	return line
 }
 
 func processIntList(list []int) (int, error) {
