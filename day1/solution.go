@@ -8,6 +8,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/julian-one/advent-of-code/utils"
 )
 
 func Solution() (int, error) {
@@ -44,7 +46,7 @@ func processFileByLine() (int, error) {
 		}
 		calibrationValues = append(calibrationValues, calibrationValue)
 	}
-	calibrationSum = sumArray(calibrationValues)
+	calibrationSum = utils.SumArray(calibrationValues)
 	return calibrationSum, nil
 }
 
@@ -146,12 +148,4 @@ func combineInts(a int, b int) (int, error) {
 		return -1, err
 	}
 	return result, nil
-}
-
-func sumArray(arr []int) int {
-	sum := 0
-	for _, v := range arr {
-		sum += v
-	}
-	return sum
 }

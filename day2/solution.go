@@ -7,6 +7,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/julian-one/advent-of-code/utils"
 )
 
 const (
@@ -17,7 +19,7 @@ const (
 
 func Solution() (int, error) {
 	ids := processFileByLine()
-	answer := sumArray(ids)
+	answer := utils.SumArray(ids)
 	return answer, nil
 }
 
@@ -97,12 +99,4 @@ func isValidGame(cubeColor string, cubeCount int) bool {
 		return cubeCount <= blue
 	}
 	return false
-}
-
-func sumArray(arr []int) int {
-	sum := 0
-	for _, v := range arr {
-		sum += v
-	}
-	return sum
 }
