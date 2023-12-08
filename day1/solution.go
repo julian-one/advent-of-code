@@ -6,8 +6,8 @@ import (
 	"io"
 	"log"
 	"os"
-	"regexp"
 	"strconv"
+	"strings"
 )
 
 func Solution() (int, error) {
@@ -26,7 +26,7 @@ func processFileByLine() (int, error) {
 	defer f.Close()
 
 	var calibrationValues []int
-	var sum int
+	var calibrationSum int
 	for {
 		line, err := r.ReadString('\n')
 		if err == io.EOF {
@@ -35,18 +35,17 @@ func processFileByLine() (int, error) {
 			fmt.Printf("error reading the string %s", err)
 			break
 		}
-		fmt.Println("(1) line:", line)
-		transformedLine := transformDigitsInLine(line)
-		fmt.Println("(2) transformed line:", transformedLine)
-		nums := findAllIntsInLine(transformedLine)
-		n, err := processIntList(nums)
+		m1 := findSpelledOutDigits(line)
+		m2 := findDigits(line, m1)
+		smallest, largest := processMap(m2)
+		calibrationValue, err := processInts(smallest, largest)
 		if err != nil {
 			log.Panic(err)
 		}
-		calibrationValues = append(calibrationValues, n)
+		calibrationValues = append(calibrationValues, calibrationValue)
 	}
-	sum = sumArray(calibrationValues)
-	return sum, nil
+	calibrationSum = sumArray(calibrationValues)
+	return calibrationSum, nil
 }
 
 func readFile(path string) (*bufio.Reader, *os.File, error) {
@@ -58,22 +57,21 @@ func readFile(path string) (*bufio.Reader, *os.File, error) {
 	return r, f, nil
 }
 
-func findAllIntsInLine(line string) []int {
-	var nums []int
-	for _, el := range line {
+func findDigits(line string, m map[int]int) map[int]int {
+	for i, el := range line {
 		// use ASCII value to check if it is a digit
 		if el >= '0' && el <= '9' {
 			// from ASCII value to int
 			// 0 has ASCII value of 48
 			// e.g. 3's ASCII value is 51, 51 - 48 = 3
 			digit := int(el - '0')
-			nums = append(nums, digit)
+			m[i] = digit
 		}
 	}
-	return nums
+	return m
 }
 
-func transformDigitsInLine(line string) string {
+func findSpelledOutDigits(line string) map[int]int {
 	m := map[string]string{
 		"one":   "1",
 		"two":   "2",
@@ -86,24 +84,51 @@ func transformDigitsInLine(line string) string {
 		"nine":  "9",
 	}
 
-	for word, num := range m {
-		re := regexp.MustCompile(word)
-		line = re.ReplaceAllString(line, num)
-	}
+	line = strings.ToLower(line)
+	digitMap := make(map[int]int)
 
-	return line
+	for word, digit := range m {
+		index := 0
+		for {
+			position := strings.Index(line[index:], word)
+			if position == -1 {
+				break
+			}
+			originalIndex := index + position
+
+			digitAsNumber, _ := strconv.Atoi(digit)
+			digitMap[originalIndex] = digitAsNumber
+			index += position + len(word)
+		}
+	}
+	return digitMap
 }
 
-func processIntList(list []int) (int, error) {
-	if len(list) == 1 {
-		c, err := combineInts(list[0], list[0])
-		if err != nil {
-			log.Panic(err)
-		}
-		return c, nil
+func processMap(m map[int]int) (int, int) {
+	if len(m) == 0 {
+		log.Panic("empty map?!")
 	}
 
-	a, b := list[0], list[len(list)-1]
+	var smallest, largest int
+	first := true
+
+	for key := range m {
+		if first {
+			smallest, largest = key, key
+			first = false
+		} else {
+			if key < smallest {
+				smallest = key
+			}
+			if key > largest {
+				largest = key
+			}
+		}
+	}
+	return m[smallest], m[largest]
+}
+
+func processInts(a int, b int) (int, error) {
 	c, err := combineInts(a, b)
 	if err != nil {
 		log.Panic(err)
