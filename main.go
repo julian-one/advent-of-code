@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/julian-one/advent-of-code/day1"
+	"github.com/julian-one/advent-of-code/day2"
 )
 
 func main() {
@@ -15,10 +15,11 @@ func main() {
 }
 
 func run() error {
-	answer, err := day1.Solution()
+	// answer, err := day1.Solution()
+	err := day2.Solution()
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Day 1 Solution; sum of all of the calibration values:", answer)
+	// fmt.Println("Day 1 Solution; sum of all of the calibration values:", answer)
 	return nil
 }
