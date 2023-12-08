@@ -15,9 +15,10 @@ const (
 	blue  = 14
 )
 
-func Solution() error {
-	processFileByLine()
-	return nil
+func Solution() (int, error) {
+	ids := processFileByLine()
+	answer := sumArray(ids)
+	return answer, nil
 }
 
 func readFile(path string) (*bufio.Scanner, *os.File, error) {
@@ -29,28 +30,32 @@ func readFile(path string) (*bufio.Scanner, *os.File, error) {
 	return s, f, nil
 }
 
-func processFileByLine() {
+func processFileByLine() []int {
 	s, f, err := readFile("day2/input.txt")
 	if err != nil {
 		log.Panic(err)
 	}
 	defer f.Close()
+
+	var validGameIds []int
+
 	for s.Scan() {
 		line := s.Text()
-		m := makeGameMap(line)
-		fmt.Println(m)
+		id, isValid := processGame(line)
+		if isValid {
+			validGameIds = append(validGameIds, id)
+		}
 	}
 
 	if err := s.Err(); err != nil {
 		fmt.Println("Error reading from file:", err)
 	}
+	return validGameIds
 }
 
-func makeGameMap(game string) map[int]map[string]int {
-	gameData := make(map[int]map[string]int)
+func processGame(game string) (int, bool) {
 
 	parts := strings.Split(game, ":")
-
 	if len(parts) != 2 {
 		log.Panic("invalid game format")
 	}
@@ -58,22 +63,46 @@ func makeGameMap(game string) map[int]map[string]int {
 	gameIdPart := strings.TrimSpace(strings.TrimPrefix(parts[0], "Game"))
 	gameId, _ := strconv.Atoi(gameIdPart)
 
-	gameData[gameId] = make(map[string]int)
-	colorParts := strings.Split(parts[1], ";")
+	cubeSets := strings.Split(parts[1], ";")
 
-	for _, part := range colorParts {
-		items := strings.Split(strings.TrimSpace(part), ",")
+	for _, part := range cubeSets {
 
-		for _, item := range items {
-			colorData := strings.Fields(strings.TrimSpace(item))
+		cubeColors := strings.Split(strings.TrimSpace(part), ",")
+
+		for _, cubeColor := range cubeColors {
+
+			colorData := strings.Fields(strings.TrimSpace(cubeColor))
 
 			if len(colorData) == 2 {
 				count, _ := strconv.Atoi(colorData[0])
 				color := colorData[1]
-				gameData[gameId][color] += count
+
+				isValid := isValidGame(color, count)
+				if !isValid {
+					return gameId, false
+				}
 			}
 		}
 	}
+	return gameId, true
+}
 
-	return gameData
+func isValidGame(cubeColor string, cubeCount int) bool {
+	switch cubeColor {
+	case "red":
+		return cubeCount <= red
+	case "green":
+		return cubeCount <= green
+	case "blue":
+		return cubeCount <= blue
+	}
+	return false
+}
+
+func sumArray(arr []int) int {
+	sum := 0
+	for _, v := range arr {
+		sum += v
+	}
+	return sum
 }
