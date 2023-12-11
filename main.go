@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/julian-one/advent-of-code/day2"
+	"github.com/julian-one/advent-of-code/day3"
 )
 
 func main() {
@@ -15,10 +15,10 @@ func main() {
 }
 
 func run() error {
-	part2, err := day2.Solution()
+	part1, err := day3.Solution()
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Day 2 Part 2 Solution", part2)
+	fmt.Println("Day 3 Part 1 Solution", part1)
 	return nil
 }
