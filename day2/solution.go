@@ -1,10 +1,7 @@
 package day2
 
 import (
-	"bufio"
-	"fmt"
 	"log"
-	"os"
 	"strconv"
 	"strings"
 
@@ -17,45 +14,41 @@ const (
 	blue  = 14
 )
 
+type Game struct {
+	id   int
+	cube []Cube
+}
+
+type Cube struct {
+	color string
+	count int
+}
+
 func Solution() (int, error) {
-	ids := processFileByLine()
-	answer := utils.SumArray(ids)
-	return answer, nil
+	powerOfGames := calculate()
+	part2 := utils.SumArray(powerOfGames)
+	return part2, nil
 }
 
-func readFile(path string) (*bufio.Scanner, *os.File, error) {
-	f, err := os.Open(path)
-	if err != nil {
-		return nil, nil, err
-	}
-	s := bufio.NewScanner(f)
-	return s, f, nil
-}
-
-func processFileByLine() []int {
-	s, f, err := readFile("day2/input.txt")
+func calculate() []int {
+	lines, err := utils.ReadFile("day2/input.txt")
 	if err != nil {
 		log.Panic(err)
 	}
-	defer f.Close()
 
-	var validGameIds []int
+	var gamePowers []int
 
-	for s.Scan() {
-		line := s.Text()
-		id, isValid := processGame(line)
-		if isValid {
-			validGameIds = append(validGameIds, id)
-		}
+	for _, line := range lines {
+		_, maxCounts := processGame(line)
+
+		gamePower := powerCubeSet(maxCounts)
+		gamePowers = append(gamePowers, gamePower)
+
 	}
-
-	if err := s.Err(); err != nil {
-		fmt.Println("Error reading from file:", err)
-	}
-	return validGameIds
+	return gamePowers
 }
 
-func processGame(game string) (int, bool) {
+func processGame(game string) (int, map[string]int) {
 
 	parts := strings.Split(game, ":")
 	if len(parts) != 2 {
@@ -66,6 +59,7 @@ func processGame(game string) (int, bool) {
 	gameId, _ := strconv.Atoi(gameIdPart)
 
 	cubeSets := strings.Split(parts[1], ";")
+	maxCounts := make(map[string]int)
 
 	for _, part := range cubeSets {
 
@@ -79,24 +73,32 @@ func processGame(game string) (int, bool) {
 				count, _ := strconv.Atoi(colorData[0])
 				color := colorData[1]
 
-				isValid := isValidGame(color, count)
-				if !isValid {
-					return gameId, false
+				currentMin, exists := maxCounts[color]
+				if !exists || count > currentMin {
+					maxCounts[color] = count
 				}
 			}
 		}
 	}
-	return gameId, true
+	return gameId, maxCounts
 }
 
-func isValidGame(cubeColor string, cubeCount int) bool {
-	switch cubeColor {
+func (c Cube) isValidGame() bool {
+	switch c.color {
 	case "red":
-		return cubeCount <= red
+		return c.count <= red
 	case "green":
-		return cubeCount <= green
+		return c.count <= green
 	case "blue":
-		return cubeCount <= blue
+		return c.count <= blue
 	}
 	return false
+}
+
+func powerCubeSet(cubeSet map[string]int) int {
+	power := 1
+	for _, v := range cubeSet {
+		power *= v
+	}
+	return power
 }
