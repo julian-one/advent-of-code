@@ -10,7 +10,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to parse input for day 1: %v", err)
 	}
-	answer, err := day1.Day1(l, r)
+	answer := day1.Day1(l, r)
 	if err != nil {
 		log.Fatalf("failed to solve day 1: %v", err)
 	}

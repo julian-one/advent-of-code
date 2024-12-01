@@ -35,7 +35,7 @@ func ParseInput() ([]int64, []int64, error) {
 	return left, right, nil
 }
 
-func Day1(left, right []int64) (int64, error) {
+func Day1(left, right []int64) int64 {
 	sort.Slice(left, func(i, j int) bool {
 		return left[i] < left[j]
 	})
@@ -51,5 +51,5 @@ func Day1(left, right []int64) (int64, error) {
 		}
 		total += distance
 	}
-	return total, nil
+	return total
 }
