@@ -4,6 +4,7 @@ import (
 	"advent-of-code-2024/day1"
 	"advent-of-code-2024/day2"
 	"advent-of-code-2024/day3"
+	"advent-of-code-2024/day4"
 	"log"
 )
 
@@ -30,4 +31,9 @@ func main() {
 		log.Fatalf("failed to solve day 3: %v", err)
 	}
 	log.Printf("day 3 answer: %d", d3)
+	d4, err := day4.Day4()
+	if err != nil {
+		log.Fatalf("failed to solve day 4: %v", err)
+	}
+	log.Printf("day 4 answer: %d", d4)
 }
